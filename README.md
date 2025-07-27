@@ -128,29 +128,6 @@ services:
 - **Ingress** : Configuration des domaines et TLS
 - **Environnement** : Variables d'environnement personnalisées
 
-## 🏗️ Architecture du projet
-
-```
-teleflix/
-├── cmd/
-│   └── main.go              # Point d'entrée principal
-├── internal/
-│   ├── cmd/                 # Commandes CLI
-│   │   └── root.go
-│   ├── config/              # Gestion de la configuration
-│   │   └── config.go
-│   ├── generator/           # Génération des manifests
-│   │   └── generator.go
-│   └── k8s/                 # Types Kubernetes
-│       └── types.go
-├── scripts/                 # Scripts utilitaires
-│   ├── deploy.sh           # Déploiement automatique
-│   └── debug.sh            # Diagnostic
-├── config.yaml              # Configuration par défaut
-├── Makefile                 # Commandes de build et déploiement
-└── go.mod                   # Dépendances Go
-```
-
 ## 🎯 Exemples d'usage
 
 ### Configuration minimale
