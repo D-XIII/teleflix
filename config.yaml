@@ -1,0 +1,151 @@
+namespace: teleflix
+storageClass: local-path
+domain: purplegaze.app
+
+services:
+  jellyfin:
+    enabled: true
+    exposed: true
+    image: jellyfin/jellyfin
+    tag: latest
+    port: 8096
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2
+        memory: 2Gi
+    volumes:
+      - name: media
+        mountPath: /media
+        readOnly: true
+      - name: config
+        mountPath: /config
+        size: 1Gi
+
+  sonarr:
+    enabled: true
+    exposed: false
+    image: linuxserver/sonarr
+    tag: latest
+    port: 8989
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/Paris"
+    volumes:
+      - name: config
+        mountPath: /config
+        size: 1Gi
+      - name: downloads
+        mountPath: /downloads
+      - name: media
+        mountPath: /tv
+
+  radarr:
+    enabled: true
+    exposed: false
+    image: linuxserver/radarr
+    tag: latest
+    port: 7878
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/Paris"
+    volumes:
+      - name: config
+        mountPath: /config
+        size: 1Gi
+      - name: downloads
+        mountPath: /downloads
+      - name: media
+        mountPath: /movies
+
+  jackett:
+    enabled: true
+    exposed: false
+    image: linuxserver/jackett
+    tag: latest
+    port: 9117
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/Paris"
+    volumes:
+      - name: config
+        mountPath: /config
+        size: 500Mi
+
+  qbittorrent:
+    enabled: true
+    exposed: false
+    image: linuxserver/qbittorrent
+    tag: latest
+    port: 8080
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1
+        memory: 1Gi
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/Paris"
+      WEBUI_PORT: "8080"
+    volumes:
+      - name: config
+        mountPath: /config
+        size: 1Gi
+      - name: downloads
+        mountPath: /downloads
+
+storage:
+  media:
+    size: 100Gi
+    accessModes:
+      - ReadWriteOnce
+  downloads:
+    size: 50Gi
+    accessModes:
+      - ReadWriteOnce
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
+
+  tls:
+    enabled: true
+    secretName: teleflix-tls-secret
+
+certManager:
+  enabled: true
+  issuer:
+    name: teleflix-issuer
+    type: letsencrypt
+    email: "hugo.benard@live.fr"
